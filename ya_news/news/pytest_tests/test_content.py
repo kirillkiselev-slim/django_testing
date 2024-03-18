@@ -44,9 +44,9 @@ def test_home_page(news_on_page, client):
 @pytest.mark.parametrize(
     'name, args',
     (
-            (
-                    'news:detail', pytest.lazy_fixture('pk_for_args')
-            ),
+        (
+            'news:detail', pytest.lazy_fixture('pk_for_args')
+        ),
     )
 )
 @pytest.mark.django_db

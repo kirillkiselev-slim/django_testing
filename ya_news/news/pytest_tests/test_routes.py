@@ -7,15 +7,14 @@ import pytest
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     'name, args',
-
     (
-            (
-                    'news:detail', pytest.lazy_fixture('pk_for_args')
-            ),
-            ('news:home', None),
-            ('users:login', None),
-            ('users:logout', None),
-            ('users:signup', None)
+        (
+            'news:detail', pytest.lazy_fixture('pk_for_args')
+        ),
+        ('news:home', None),
+        ('users:login', None),
+        ('users:logout', None),
+        ('users:signup', None)
     ),
 )
 def test_pages_availability_for_anonymous_user(client, name, args):
@@ -27,23 +26,23 @@ def test_pages_availability_for_anonymous_user(client, name, args):
 @pytest.mark.parametrize(
     'parametrized_client, expected_status',
     (
-            (
-                    pytest.lazy_fixture('not_author_client'), HTTPStatus.NOT_FOUND
-            ),
-            (
-                    pytest.lazy_fixture('author_client'), HTTPStatus.OK
-            )
+        (
+            pytest.lazy_fixture('not_author_client'), HTTPStatus.NOT_FOUND
+        ),
+        (
+            pytest.lazy_fixture('author_client'), HTTPStatus.OK
+        )
     ),
 )
 @pytest.mark.parametrize(
     'name, args',
     (
-            (
-                    'news:delete', pytest.lazy_fixture('pk_for_comment')
-            ),
-            (
-                    'news:edit', pytest.lazy_fixture('pk_for_comment')
-            ),
+        (
+            'news:delete', pytest.lazy_fixture('pk_for_comment')
+        ),
+        (
+            'news:edit', pytest.lazy_fixture('pk_for_comment')
+        ),
     ),
 )
 def test_editing_and_deleting_for_different_users(parametrized_client,
