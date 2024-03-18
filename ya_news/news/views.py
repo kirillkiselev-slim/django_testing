@@ -27,18 +27,14 @@ class NewsList(generic.ListView):
 class NewsDetail(generic.DetailView):
     model = News
     template_name = 'news/detail.html'
-
-    def get_object(self, queryset=None):
-        obj = get_object_or_404(
-            self.model.objects.prefetch_related('comment_set__author'),
-            pk=self.kwargs['pk']
-        )
-        return obj
+    queryset = News.objects.prefetch_related('comment_set__author')
+    pk_url_kwarg = 'pk'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.user.is_authenticated:
             context['form'] = CommentForm()
+            context['comments'] = self.object.comment_set.all()
         return context
 
 

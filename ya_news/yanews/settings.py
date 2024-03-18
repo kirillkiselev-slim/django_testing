@@ -6,6 +6,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-7)dgs++2!#==aye4rd=5)c)bw0eokiyqx0hts6#t80!$c&$s+('
 
+NEWS_COUNT_ON_HOME_PAGE = 10
+
 DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
