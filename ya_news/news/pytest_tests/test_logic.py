@@ -1,8 +1,8 @@
 from http import HTTPStatus
-from pytest_django.asserts import assertRedirects, assertFormError
-from news.forms import WARNING, BAD_WORDS, CommentForm
+from pytest_django.asserts import assertFormError
+from news.forms import WARNING, BAD_WORDS
 from django.urls import reverse
-from news.models import Comment, News
+from news.models import Comment
 import pytest
 
 
@@ -13,7 +13,8 @@ def test_anonymous_user_cannot_leave_comment(client, form_data, pk_for_args):
     assert Comment.objects.count() == 0
 
 
-def test_authorized_user_can_leave_comment(author_client, form_data, pk_for_args):
+def test_authorized_user_can_leave_comment(author_client,
+                                           form_data, pk_for_args):
     url = reverse('news:detail', args=pk_for_args)
     author_client.post(url, data=form_data)
     assert Comment.objects.count() == 1
@@ -32,7 +33,8 @@ def test_bad_words(author_client, bad_word, pk_for_args):
                     errors=WARNING)
 
 
-def test_author_can_edit_comment(author_client, form_data_edit_comment, comment):
+def test_author_can_edit_comment(author_client, form_data_edit_comment,
+                                 comment):
     url = reverse('news:edit', args=(comment.id,))
     author_client.post(url, data=form_data_edit_comment)
     comment.refresh_from_db()
@@ -51,13 +53,14 @@ def test_other_user_cant_edit_comment(not_author_client, form_data, comment):
     assert comment.news == note_from_db.news
 
 
-def test_author_can_delete_comment(author_client,form_data, pk_for_comment):
+def test_author_can_delete_comment(author_client, form_data, pk_for_comment):
     url = reverse('news:delete', args=pk_for_comment)
     author_client.post(url, data=form_data)
     assert Comment.objects.count() == 0
 
 
-def test_other_user_cant_delete_note(not_author_client, form_data, pk_for_comment):
+def test_other_user_cant_delete_note(not_author_client,
+                                     form_data, pk_for_comment):
     url = reverse('news:delete', args=pk_for_comment)
     response = not_author_client.post(url, data=form_data)
     assert response.status_code == HTTPStatus.NOT_FOUND

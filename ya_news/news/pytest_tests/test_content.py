@@ -6,10 +6,14 @@ import pytest
 @pytest.mark.parametrize(
     'parametrized_client, args, comment_in_form',
     (
-            (pytest.lazy_fixture('author_client'),
-             pytest.lazy_fixture('pk_for_args'), True),
-            (pytest.lazy_fixture('not_auth_client'),
-             pytest.lazy_fixture('pk_for_args'), False),
+            (
+                    pytest.lazy_fixture('author_client'),
+                    pytest.lazy_fixture('pk_for_args'), True
+            ),
+            (
+                    pytest.lazy_fixture('not_auth_client'),
+                    pytest.lazy_fixture('pk_for_args'), False
+            ),
     )
 )
 def test_comments_for_different_users(parametrized_client, args,
@@ -40,7 +44,9 @@ def test_home_page(news_on_page, client):
 @pytest.mark.parametrize(
     'name, args',
     (
-            ('news:detail', pytest.lazy_fixture('pk_for_args')),
+            (
+                    'news:detail', pytest.lazy_fixture('pk_for_args')
+            ),
     )
 )
 @pytest.mark.django_db

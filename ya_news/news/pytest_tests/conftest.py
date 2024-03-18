@@ -85,6 +85,7 @@ def form_data_edit_comment(news, author):
         'text': 'edit not a random comment'
     }
 
+
 @pytest.fixture
 def comments(author, news):
     now = timezone.now()

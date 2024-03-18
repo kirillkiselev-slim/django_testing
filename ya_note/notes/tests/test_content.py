@@ -28,7 +28,7 @@ class TestNotesListPage(TestCase):
         author_notes = [
             Note(
                 title=f'Title_author{index}',
-                text=f'text_author',
+                text='text_author',
                 slug=f'{int(index)}_unique-slug-author',
                 author=cls.author
             ) for index in range(1, 11)
@@ -38,7 +38,7 @@ class TestNotesListPage(TestCase):
         other_user_notes = [
             Note(
                 title=f'Title_other_user{index}',
-                text=f'text_other_user',
+                text='text_other_user',
                 slug=f'{int(index)}_unique-slug-other-user',
                 author=cls.other_user
             ) for index in range(1, 11)
@@ -57,8 +57,10 @@ class TestNotesListPage(TestCase):
         object_list_author = response_author.context['object_list']
         object_list_other_user = response_other_user.context['object_list']
         all_notes_author = sorted([notes.slug for notes in object_list_author])
-        all_notes_other_user = sorted([notes.slug for notes in object_list_other_user])
-        for note_author, note_other_user in zip(all_notes_author, all_notes_other_user):
+        all_notes_other_user = sorted([notes.slug
+                                       for notes in object_list_other_user])
+        for note_author, note_other_user in zip(all_notes_author,
+                                                all_notes_other_user):
             self.assertNotEqual(note_author, note_other_user)
 
 
