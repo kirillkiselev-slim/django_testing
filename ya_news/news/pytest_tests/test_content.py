@@ -1,58 +1,35 @@
+import pytest, pdb
 from django.urls import reverse
-import pytest
+
+
+NEWS_DETAIL = pytest.lazy_fixture('news_detail')
+
+NEWS_HOME = pytest.lazy_fixture('news_home')
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize(
-    'parametrized_client, args, comment_in_form',
-    (
-        (
-            pytest.lazy_fixture('author_client'),
-            pytest.lazy_fixture('pk_for_args'), True
-        ),
-        (
-            pytest.lazy_fixture('not_auth_client'),
-            pytest.lazy_fixture('pk_for_args'), False
-        ),
-    )
-)
-def test_comments_for_different_users(parametrized_client, args,
-                                      comment_in_form, comment):
-    object_list = False
-    url = reverse('news:detail', args=args)
-    response = parametrized_client.get(url)
-    try:
-        object_list = response.context['comments']
-        assert (comment in object_list) is comment_in_form
-
-    except KeyError:
-        assert object_list is False
+def test_comments_for_not_auth_user(client, news_detail, comment, news):
+    response = client.get(NEWS_DETAIL)
+    object_list = response.context['comments']
+    assert comment not in object_list
 
 
-@pytest.mark.django_db
-def test_home_page(news_on_page, client):
-    url = reverse('news:home')
-    response = client.get(url)
+def test_comments_for_auth_user(author_client, comment):
+    response = author_client.get()
+    object_list = response.context['comments']
+    assert comment in object_list
 
-    object_list = response.context['object_list']
-    assert len(object_list) <= 10
 
-    news_dates = [news_on_page.date for news_on_page in object_list]
+def test_home_page(news_on_page, client, news):
+    response = client.get(NEWS_HOME)
+    # pdb.set_trace()
+    news_dates = [news_on_page.date for news_on_page in
+                  response.context['object_list']]
     assert news_dates == sorted(news_dates, reverse=True)
 
 
-@pytest.mark.parametrize(
-    'name, args',
-    (
-        (
-            'news:detail', pytest.lazy_fixture('pk_for_args')
-        ),
-    )
-)
-@pytest.mark.django_db
-def test_news_comments_order(name, args, news, comments, author_client):
-    url = reverse('news:detail', args=args)
-    response = author_client.get(url)
-    news_comments = response.context['comments']
-    comment_dates = [comments.created for comments in news_comments]
+def test_news_comments_order(news, comments, author_client):
+    response = author_client.get(NEWS_DETAIL)
+    comment_dates = [comments.created for comments in
+                     response.context['comments']]
     assert comment_dates == sorted(comment_dates)

@@ -3,8 +3,10 @@ from datetime import datetime, timedelta
 import pytest
 from django.test.client import Client
 from django.utils import timezone
-from news.models import Comment, News
 from django.conf import settings
+from django.urls import reverse
+
+from news.models import Comment, News
 
 
 @pytest.fixture
@@ -18,10 +20,9 @@ def not_author(django_user_model):
 
 
 @pytest.fixture
-def author_client(author):  # Вызываем фикстуру автора.
-    # Создаём новый экземпляр клиента, чтобы не менять глобальный.
+def author_client(author):
     client = Client()
-    client.force_login(author)  # Логиним автора в клиенте.
+    client.force_login(author)
     return client
 
 
@@ -33,39 +34,51 @@ def not_author_client(not_author):
 
 
 @pytest.fixture
-def not_auth_client():
-    client = Client()  # Логиним обычного пользователя в клиенте.
-    return client
-
-
-@pytest.fixture
 def news():
-    news = News.objects.create(
+    return News.objects.create(
         title='Title',
         text='Text',
         date=timezone.now()
     )
-    return news
 
 
 @pytest.fixture
 def comment(author, news):
-    comment = Comment.objects.create(
+    return Comment.objects.create(
         news=news,
         author=author,
         text='Random comment'
     )
-    return comment
 
 
 @pytest.fixture
-def pk_for_args(news):
-    return (news.id,)
+def news_detail(news):
+    return reverse('news:detail', args=[news.pk])
 
 
 @pytest.fixture
-def pk_for_comment(comment):
-    return (comment.id,)
+def news_home(news_on_page):
+    return reverse('news:home')
+
+
+@pytest.fixture
+def comment_edit():
+    return reverse('news:edit')
+
+
+@pytest.fixture
+def comment_delete():
+    return reverse('news:delete')
+
+
+# @pytest.fixture
+# def pk_for_args(news):
+#     return (news.id,)
+#
+#
+# @pytest.fixture
+# def pk_for_comment(comment):
+#     return (comment.id,)
 
 
 @pytest.fixture
