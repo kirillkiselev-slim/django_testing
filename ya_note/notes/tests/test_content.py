@@ -4,7 +4,7 @@ from django.test import Client
 
 from notes.models import Note
 from notes.forms import NoteForm
-from .urls_for_tests import *
+from .urls_for_tests import NOTES_LIST_URL, NOTES_ADD_URL, edit_slug
 
 User = get_user_model()
 

@@ -10,6 +10,7 @@ from news.models import Comment, News
 
 LOGIN_URL = reverse('users:login')
 
+
 @pytest.fixture
 def author(django_user_model):
     return django_user_model.objects.create(username='Автор')

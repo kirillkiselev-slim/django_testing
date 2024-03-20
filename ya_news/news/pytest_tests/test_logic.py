@@ -16,16 +16,16 @@ NEWS = pytest.lazy_fixture('news')
 AUTHOR = pytest.lazy_fixture('author_client')
 
 FORM_DATA = {
-        'news': NEWS,
-        'author': AUTHOR,
-        'text': 'not a random comment'
-    }
+    'news': NEWS,
+    'author': AUTHOR,
+    'text': 'not a random comment'
+}
 
 FORM_DATA_EDIT_COMMENT = {
-        'news': NEWS,
-        'author': AUTHOR,
-        'text': 'edit not a random comment'
-    }
+    'news': NEWS,
+    'author': AUTHOR,
+    'text': 'edit not a random comment'
+}
 
 
 def test_anonymous_user_cannot_post_comment(client, news):

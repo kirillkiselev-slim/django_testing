@@ -5,7 +5,18 @@ from django.contrib.auth import get_user_model
 from django.test import Client
 
 from notes.models import Note
-from .urls_for_tests import *
+from .urls_for_tests import (
+    NOTES_ADD_URL,
+    NOTES_HOME_URL,
+    NOTES_LIST_URL,
+    NOTES_SUCCESS_URL,
+    detail_slug,
+    edit_slug,
+    delete_slug,
+    SIGN_UP_URL,
+    LOGIN_URL,
+    LOGOUT_URL,
+)
 
 User = get_user_model()
 
