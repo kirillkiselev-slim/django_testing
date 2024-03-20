@@ -1,74 +1,67 @@
 from http import HTTPStatus
+
 from django.test import TestCase
-from django.urls import reverse
-
 from django.contrib.auth import get_user_model
-from notes.models import Note
+from django.test import Client
 
+from notes.models import Note
+from .urls_for_tests import *
 
 User = get_user_model()
 
+CLIENT = Client()
 
-class TestRoutes(TestCase):
+OK_STATUS = HTTPStatus.OK
+
+NOT_FOUND_STATUS = HTTPStatus.NOT_FOUND
+
+
+class TestBaseClass(TestCase):
 
     @classmethod
     def setUpTestData(cls):
         cls.author = User.objects.create(username='author')
         cls.reader = User.objects.create(username='reader')
-        cls.notes = Note.objects.create(title='Заголовок', text='Текст',
-                                        author=cls.author,
-                                        slug='some-random-slug')
+        cls.auth_author, cls.auth_reader = Client(), Client()
+        cls.auth_author.force_login(cls.author)
+        cls.auth_reader.force_login(cls.reader)
 
-    def test_availability_for_notes_edit_and_delete(self):
-        users_statuses = (
-            (self.author, HTTPStatus.OK),
-            (self.reader, HTTPStatus.NOT_FOUND),
+        cls.note = Note.objects.create(title='Заголовок', text='Текст',
+                                       author=cls.author,
+                                       slug='some-random-slug')
+
+
+class TestRoutes(TestBaseClass):
+    def test_availability_for_pages(self):
+        parametrized_scenarios = (
+            (detail_slug(self.note.slug), self.auth_author, OK_STATUS),
+            (detail_slug(self.note.slug), self.auth_reader, NOT_FOUND_STATUS),
+            (edit_slug(self.note.slug), self.auth_author, OK_STATUS),
+            (edit_slug(self.note.slug), self.auth_reader, NOT_FOUND_STATUS),
+            (delete_slug(self.note.slug), self.auth_author, OK_STATUS),
+            (delete_slug(self.note.slug), self.auth_reader, NOT_FOUND_STATUS),
+            (NOTES_LIST_URL, self.auth_author, OK_STATUS),
+            (NOTES_ADD_URL, self.auth_author, OK_STATUS),
+            (NOTES_SUCCESS_URL, self.auth_author, OK_STATUS),
+            (NOTES_HOME_URL, CLIENT, OK_STATUS),
+            (LOGIN_URL, CLIENT, OK_STATUS),
+            (LOGOUT_URL, CLIENT, OK_STATUS),
+            (SIGN_UP_URL, CLIENT, OK_STATUS),
         )
 
-        for user, status in users_statuses:
-            self.client.force_login(user)
-            for name in ('notes:edit', 'notes:delete', 'notes:detail'):
-                with self.subTest(user=user, name=name):
-                    url = reverse(name, args=(self.notes.slug,))
-                    response = self.client.get(url)
-                    self.assertEqual(response.status_code, status)
-
-    def test_pages_availability_for_anonymous_client(self):
-        urls = (
-            ('notes:home', None),
-            ('notes:list', None),
-            ('users:login', None),
-            ('users:logout', None),
-            ('users:signup', None),
-            ('notes:add', None),
-            ('notes:success', None),
-        )
-
-        for name, args in urls:
-            with self.subTest(name=name):
-                url = reverse(name, args=args)
-                if name not in ('notes:list', 'notes:add', 'notes:success'):
-                    response = self.client.get(url)
-                    self.assertEqual(response.status_code, HTTPStatus.OK)
-
-                self.client.force_login(self.author)
-                response = self.client.get(url)
-
-                self.assertEqual(response.status_code, HTTPStatus.OK)
+        for url, user, status in parametrized_scenarios:
+            self.assertEqual(user.get(url).status_code, status)
 
     def test_redirect_for_anonymous_client(self):
-        login_url = reverse('users:login')
-        urls = (
-            ('notes:edit', (self.notes.slug,)),
-            ('notes:delete', (self.notes.slug,)),
-            ('notes:detail', (self.notes.slug,)),
-            ('notes:list', None),
-            ('notes:add', None),
-            ('notes:success', None)
+        parametrized_scenarios = (
+            (edit_slug(self.note.slug), CLIENT),
+            (edit_slug(self.note.slug), CLIENT),
+            (edit_slug(self.note.slug), CLIENT),
+            (NOTES_LIST_URL, CLIENT),
+            (NOTES_ADD_URL, CLIENT),
+            (NOTES_SUCCESS_URL, CLIENT)
         )
-        for name, args in urls:
-            url = reverse(name, args=args)
-            with self.subTest(name=name):
-                redirect_url = f'{login_url}?next={url}'
-                response = self.client.get(url)
-                self.assertRedirects(response, redirect_url)
+
+        for url, user in parametrized_scenarios:
+            redirect_url = f'{LOGIN_URL}?next={url}'
+            self.assertRedirects(user.get(url), redirect_url)
