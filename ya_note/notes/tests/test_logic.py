@@ -3,7 +3,12 @@ from django.test import Client, TestCase
 
 from notes.models import Note
 from notes.forms import WARNING
-from .urls_for_tests import *
+from .urls_for_tests import (
+    NOTES_ADD_URL,
+    NOTES_SUCCESS_URL,
+    edit_slug,
+    delete_slug,
+)
 
 User = get_user_model()
 
