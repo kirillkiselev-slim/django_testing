@@ -70,6 +70,7 @@ class TestNoteEditDelete(TestBaseClass):
         note = Note.objects.get()
         response = self.auth_user.post(
             edit_slug(self.note.slug), data=FORM_DATE_UNIQUE)
+
         self.assertRedirects(response, NOTES_SUCCESS_URL)
         note_updated = Note.objects.get(pk=note.pk)
         self.assertEqual(note_updated.text, FORM_DATE_UNIQUE['text'])
@@ -89,4 +90,3 @@ class TestSlugifyTitle(TestBaseClass):
         self.assertEqual(new_note.slug, form_data['slug'])
         self.assertEqual(new_note.title, FORM_DATE_UNIQUE['title'])
         self.assertEqual(new_note.text, FORM_DATE_UNIQUE['text'])
-

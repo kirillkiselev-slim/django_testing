@@ -1,4 +1,4 @@
-import pytest, pdb
+import pytest
 
 pytestmark = pytest.mark.django_db
 
@@ -24,7 +24,6 @@ def test_comments_for_auth_user(author_client, url, comment):
 @pytest.mark.parametrize('url', (NEWS_HOME_URL,))
 def test_home_page(news_on_page, client, url):
     response = client.get(url)
-    # pdb.set_trace()
     news_dates = [news_on_page.date for news_on_page in
                   response.context['object_list']]
     assert news_dates == sorted(news_dates, reverse=True)

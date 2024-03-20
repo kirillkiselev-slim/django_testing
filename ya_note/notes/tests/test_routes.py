@@ -50,7 +50,8 @@ class TestRoutes(TestBaseClass):
         )
 
         for url, user, status in parametrized_scenarios:
-            self.assertEqual(user.get(url).status_code, status)
+            with self.subTest(url=url, user=user, status=status):
+                self.assertEqual(user.get(url).status_code, status)
 
     def test_redirect_for_anonymous_client(self):
         parametrized_scenarios = (
@@ -63,5 +64,6 @@ class TestRoutes(TestBaseClass):
         )
 
         for url, user in parametrized_scenarios:
-            redirect_url = f'{LOGIN_URL}?next={url}'
-            self.assertRedirects(user.get(url), redirect_url)
+            with self.subTest(url=url, user=user):
+                redirect_url = f'{LOGIN_URL}?next={url}'
+                self.assertRedirects(user.get(url), redirect_url)
