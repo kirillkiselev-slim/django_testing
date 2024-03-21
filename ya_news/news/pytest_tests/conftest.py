@@ -8,8 +8,6 @@ from django.urls import reverse
 
 from news.models import Comment, News
 
-LOGIN_URL = reverse('users:login')
-
 
 @pytest.fixture
 def author(django_user_model):
@@ -74,15 +72,30 @@ def comment_delete(comment):
 
 
 @pytest.fixture
-def redirect_url_edit_comment(comment):
+def redirect_url_edit_comment(comment, login):
     url = reverse('news:edit', args=[comment.pk])
-    return f'{LOGIN_URL}?next={url}'
+    return f'{login}?next={url}'
 
 
 @pytest.fixture
-def redirect_url_delete_comment(comment):
+def redirect_url_delete_comment(comment, login):
     url = reverse('news:delete', args=[comment.pk])
-    return f'{LOGIN_URL}?next={url}'
+    return f'{login}?next={url}'
+
+
+@pytest.fixture
+def login():
+    return reverse('users:login')
+
+
+@pytest.fixture
+def logout():
+    return reverse('users:login')
+
+
+@pytest.fixture
+def signup():
+    return reverse('users:signup')
 
 
 @pytest.fixture
@@ -94,8 +107,6 @@ def comments(author, news):
         )
         comment.created = now + timedelta(days=index)
         comment.save()
-
-    return comments
 
 
 @pytest.fixture
@@ -109,5 +120,3 @@ def news_on_page():
         ) for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
     ]
     News.objects.bulk_create(news)
-
-    return news
