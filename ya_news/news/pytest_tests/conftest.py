@@ -47,7 +47,8 @@ def comment(author, news):
     return Comment.objects.create(
         news=news,
         author=author,
-        text='Random comment'
+        text='Random comment',
+        created=timezone.now()
     )
 
 

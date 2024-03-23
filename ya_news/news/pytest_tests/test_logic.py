@@ -25,8 +25,8 @@ def test_anonymous_user_cannot_post_comment(client, news_detail):
     assert Comment.objects.count() == 0
 
 
-def test_authorized_user_can_leave_comment(author_client, news,
-                                           news_detail, author):
+def test_authorized_user_can_post_comment(author_client, news,
+                                          news_detail, author):
     author_client.post(news_detail, data=FORM_DATA)
     assert Comment.objects.count() == 1
     comments = Comment.objects.get()
@@ -35,9 +35,9 @@ def test_authorized_user_can_leave_comment(author_client, news,
     assert comments.news == news
 
 
-@pytest.mark.parametrize('bad_word', BAD_WORD_DATA)
-def test_bad_words(author_client, bad_word, news_detail):
-    response = author_client.post(news_detail, data=bad_word)
+@pytest.mark.parametrize('bad_word_data', BAD_WORD_DATA)
+def test_bad_words(author_client, bad_word_data, news_detail):
+    response = author_client.post(news_detail, data=bad_word_data)
     assertFormError(response, 'form', 'text', errors=WARNING)
     assert Comment.objects.count() == 0
 
@@ -48,7 +48,6 @@ def test_author_can_edit_comment(author_client, comment, comment_edit):
 
     assert comment.news == updated_comment.news
     assert comment.author == updated_comment.author
-    assert not comment.text == updated_comment.text
     assert updated_comment.text == FORM_DATA_EDIT_COMMENT['text']
 
 
@@ -70,9 +69,9 @@ def test_author_can_delete_comment(author_client, comment, comment_delete):
 def test_other_user_cant_delete_note(not_author_client, comment,
                                      comment_delete):
     response = not_author_client.post(comment_delete)
+    assert Comment.objects.count() == 1
     comment_after = Comment.objects.get()
     assert response.status_code == HTTPStatus.NOT_FOUND
     assert comment_after.author == comment.author
     assert comment_after.text == comment.text
     assert comment_after.news == comment.news
-    assert Comment.objects.count() == 1
