@@ -6,6 +6,7 @@ from django.test.client import Client
 
 pytestmark = pytest.mark.django_db
 
+
 CLIENT = Client()
 NOT_FOUND_STATUS = HTTPStatus.NOT_FOUND
 OK_STATUS = HTTPStatus.OK
@@ -38,6 +39,10 @@ REDIRECT_URL_DELETE_COMMENT = (pytest.
 )
 def test_pages_availability_for_users(url, user, expected_status):
     assert user.get(url).status_code == expected_status
+
+
+
+
 
 
 @pytest.mark.parametrize(
