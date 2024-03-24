@@ -21,6 +21,7 @@ NOT_FOUND_STATUS = HTTPStatus.NOT_FOUND
 
 
 class TestRoutes(TestBaseClass):
+
     def test_availability_for_pages(self):
         parametrized_scenarios = (
             (DETAIL_SLUG_URL, self.auth_author, OK_STATUS),
@@ -32,10 +33,10 @@ class TestRoutes(TestBaseClass):
             (NOTES_LIST_URL, self.auth_author, OK_STATUS),
             (NOTES_ADD_URL, self.auth_author, OK_STATUS),
             (NOTES_SUCCESS_URL, self.auth_author, OK_STATUS),
-            (NOTES_HOME_URL, self.CLIENT, OK_STATUS),
-            (LOGIN_URL, self.CLIENT, OK_STATUS),
-            (LOGOUT_URL, self.CLIENT, OK_STATUS),
-            (SIGN_UP_URL, self.CLIENT, OK_STATUS),
+            (NOTES_HOME_URL, self.client, OK_STATUS),
+            (LOGIN_URL, self.client, OK_STATUS),
+            (LOGOUT_URL, self.client, OK_STATUS),
+            (SIGN_UP_URL, self.client, OK_STATUS),
         )
 
         for url, user, status in parametrized_scenarios:
@@ -43,17 +44,16 @@ class TestRoutes(TestBaseClass):
                 self.assertEqual(user.get(url).status_code, status)
 
     def test_redirect_for_anonymous_client(self):
-
         parametrized_scenarios = (
-            (EDIT_SLUG_URL, self.CLIENT),
-            (DELETE_SLUG_URL, self.CLIENT),
-            (DETAIL_SLUG_URL, self.CLIENT),
-            (NOTES_LIST_URL, self.CLIENT),
-            (NOTES_ADD_URL, self.CLIENT),
-            (NOTES_SUCCESS_URL, self.CLIENT)
+            (EDIT_SLUG_URL, self.client),
+            (DELETE_SLUG_URL, self.client),
+            (DETAIL_SLUG_URL, self.client),
+            (NOTES_LIST_URL, self.client),
+            (NOTES_ADD_URL, self.client),
+            (NOTES_SUCCESS_URL, self.client)
         )
+        final_url_dict = {url: REDIRECT_URL + url for url, _ in parametrized_scenarios}
 
         for url, user in parametrized_scenarios:
-            final_url = REDIRECT_URL + url
             with self.subTest(url=url, user=user):
-                self.assertRedirects(user.get(url), final_url)
+                self.assertRedirects(user.get(url), final_url_dict[url])

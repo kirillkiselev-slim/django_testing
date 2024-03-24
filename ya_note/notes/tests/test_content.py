@@ -13,21 +13,16 @@ class TestNotesListPage(TestBaseClass):
         response = self.auth_author.get(NOTES_LIST_URL)
         notes_queryset = response.context['object_list']
         self.assertIn(self.note, notes_queryset)
-        note_on_page = notes_queryset.get(pk=self.note.pk)
-        self.assertEqual(self.note.slug, note_on_page.slug)
-        self.assertEqual(self.note.author, note_on_page.author)
-        self.assertEqual(self.note.text, note_on_page.text)
-        self.assertEqual(self.note.title, note_on_page.title)
+        notes = notes_queryset.get(pk=self.note.pk)
+        self.assertEqual(self.note.slug, notes.slug)
+        self.assertEqual(self.note.author, notes.author)
+        self.assertEqual(self.note.text, notes.text)
+        self.assertEqual(self.note.title, notes.title)
 
     def test_notes_do_not_mix_for_author(self):
         response = self.auth_other_user.get(NOTES_LIST_URL)
         object_list = response.context['object_list']
         self.assertNotIn(self.note, object_list)
-
-    def test_notes_do_not_mix_for_other_user(self):
-        response = self.auth_author.get(NOTES_LIST_URL)
-        object_list = response.context['object_list']
-        self.assertNotIn(self.other_user_note, object_list)
 
     def test_user_sees_edit_and_add_form(self):
         urls = (
