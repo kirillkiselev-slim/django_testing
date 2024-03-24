@@ -5,18 +5,23 @@ from django.urls import reverse
 
 from notes.models import Note
 
+SLUG = 'random-slug-1'
+
+NOTES_HOME_URL = reverse('notes:home')
+NOTES_LIST_URL = reverse('notes:list')
+NOTES_ADD_URL = reverse('notes:add')
+NOTES_SUCCESS_URL = reverse('notes:success')
+SIGN_UP_URL = reverse('users:signup')
+LOGIN_URL = reverse('users:login')
+LOGOUT_URL = reverse('users:logout')
+REDIRECT_URL = f'{LOGIN_URL}?next='
+DETAIL_SLUG_URL = reverse('notes:detail', args=(SLUG,))
+EDIT_SLUG_URL = reverse('notes:edit', args=(SLUG,))
+DELETE_SLUG_URL = reverse('notes:delete', args=(SLUG,))
+
 
 class TestBaseClass(TestCase):
     CLIENT = Client()
-    NOTES_HOME_URL = reverse('notes:home', None)
-    NOTES_LIST_URL = reverse('notes:list', None)
-    NOTES_ADD_URL = reverse('notes:add', None)
-    NOTES_SUCCESS_URL = reverse('notes:success', None)
-    SIGN_UP_URL = reverse('users:signup', None)
-    LOGIN_URL = reverse('users:login', None)
-    LOGOUT_URL = reverse('users:logout', None)
-    REDIRECT_URL = f'{LOGIN_URL}?next='
-
     User = get_user_model()
 
     @classmethod
@@ -29,7 +34,7 @@ class TestBaseClass(TestCase):
         cls.note = Note.objects.create(
             title='Title_0',
             text='text',
-            slug='random-slug-1',
+            slug=SLUG,
             author=cls.author
         )
         cls.other_user_note = Note.objects.create(
@@ -60,10 +65,8 @@ class TestBaseClass(TestCase):
         Note.objects.bulk_create(cls.other_user_notes)
 
         cls.form_data_not_unique = {
+            'title': 'slug which holds no purpose',
+            'text': 'Some random text written here',
             'slug': 'test-not-unique-slug',
         }
         cls.note_before_count = Note.objects.count()
-
-        cls.detail_slug = reverse('notes:detail', args=(cls.note.slug,))
-        cls.edit_slug = reverse('notes:edit', args=(cls.note.slug,))
-        cls.delete_slug = reverse('notes:delete', args=(cls.note.slug,))
