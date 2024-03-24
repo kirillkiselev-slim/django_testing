@@ -41,10 +41,6 @@ def test_pages_availability_for_users(url, user, expected_status):
     assert user.get(url).status_code == expected_status
 
 
-
-
-
-
 @pytest.mark.parametrize(
     'url, user, expected_redirect',
     (
