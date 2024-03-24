@@ -52,7 +52,8 @@ class TestRoutes(TestBaseClass):
             (NOTES_ADD_URL, self.client),
             (NOTES_SUCCESS_URL, self.client)
         )
-        final_url_dict = {url: REDIRECT_URL + url for url, _ in parametrized_scenarios}
+        final_url_dict = {url: REDIRECT_URL + url
+                          for url, _ in parametrized_scenarios}
 
         for url, user in parametrized_scenarios:
             with self.subTest(url=url, user=user):
