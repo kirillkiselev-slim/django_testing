@@ -1,9 +1,9 @@
 from http import HTTPStatus
 
-from notes.models import Note
-from notes.forms import WARNING
 from pytils.translit import slugify
 
+from notes.models import Note
+from notes.forms import WARNING
 from .helpers import (
     TestBaseClass,
     NOTES_ADD_URL,
@@ -18,34 +18,35 @@ from .helpers import (
 class TestNoteCreation(TestBaseClass):
 
     def test_uniqueness_slug(self):
-        notes = Note.objects.order_by('title')
+        notes = Note.objects.order_by('slug')
         FORM_DATA['slug'] = self.note.slug
         response = self.auth_author.post(NOTES_ADD_URL, data=FORM_DATA)
         self.assertFormError(response,
                              form='form',
                              field='slug',
                              errors=self.note.slug + WARNING)
-        self.assertQuerysetEqual(Note.objects.order_by('title'), notes)
+        self.assertQuerysetEqual(Note.objects.order_by('slug'), notes)
 
     def test_auth_user_can_create_note(self):
         self.common_setup_and_assertions_create_note(FORM_DATA)
 
     def test_anonymous_user_cant_create_note(self):
-        notes = Note.objects.order_by('title')
+        notes = Note.objects.order_by('slug')
         self.client.post(NOTES_ADD_URL, data=FORM_DATA)
-        self.assertQuerysetEqual(Note.objects.order_by('title'), notes)
+        self.assertQuerysetEqual(Note.objects.order_by('slug'), notes)
 
     def test_author_can_delete_note(self):
         response = self.auth_author.delete(DELETE_SLUG_URL)
-        note_exists = Note.objects.filter(pk=self.note.pk).exists()
         self.assertRedirects(response, NOTES_SUCCESS_URL)
         self.assertEqual(Note.objects.count(), self.note_before_count - 1)
-        self.assertFalse(note_exists)
+        self.assertFalse(Note.objects.filter(pk=self.note.pk).exists())
 
     def test_other_user_cant_delete_note(self):
+        notes = Note.objects.order_by('slug')
         response = self.auth_other_user.post(DELETE_SLUG_URL)
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
         self.assertEqual(Note.objects.count(), self.note_before_count)
+        self.assertQuerysetEqual(Note.objects.order_by('slug'), notes)
 
     def test_author_can_edit_note(self):
         response = self.auth_author.post(EDIT_SLUG_URL, data=FORM_DATA)
