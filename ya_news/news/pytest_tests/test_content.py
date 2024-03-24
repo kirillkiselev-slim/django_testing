@@ -1,5 +1,7 @@
 import pytest
 
+from news.forms import CommentForm
+
 pytestmark = pytest.mark.django_db
 
 
@@ -10,9 +12,10 @@ def test_comments_for_not_auth_user(news_detail, client):
 def test_comments_for_auth_user(news_detail, author_client, comment):
     response = author_client.get(news_detail)
     assert 'comments' in response.context
-    assert comment.text == response.context['comments'][0].text
-    assert comment.author == response.context['comments'][0].author
-    assert comment.created == response.context['comments'][0].created
+    comments = response.context['comments'][0]
+    assert comment.text == comments.text
+    assert comment.author == comments.author
+    assert comment.news == comments.news
 
 
 def test_home_page(news_on_page, news_home, client):
@@ -22,6 +25,8 @@ def test_home_page(news_on_page, news_home, client):
 
 
 def test_news_comments_order(comments, news_detail, author_client):
+    response = author_client.get(news_detail)
     comment_dates = [comments.created for comments in
-                     author_client.get(news_detail).context['comments']]
+                     response.context['comments']]
     assert comment_dates == sorted(comment_dates)
+    assert isinstance(response.context['form'], CommentForm)

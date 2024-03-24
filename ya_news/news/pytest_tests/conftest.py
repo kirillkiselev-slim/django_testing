@@ -48,7 +48,6 @@ def comment(author, news):
         news=news,
         author=author,
         text='Random comment',
-        created=timezone.now()
     )
 
 

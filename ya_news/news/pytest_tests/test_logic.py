@@ -48,7 +48,7 @@ def test_author_can_edit_comment(author_client, comment, comment_edit):
 
     assert comment.news == updated_comment.news
     assert comment.author == updated_comment.author
-    assert updated_comment.text == FORM_DATA_EDIT_COMMENT['text']
+    assert FORM_DATA_EDIT_COMMENT['text'] == updated_comment.text
 
 
 def test_other_user_cant_edit_comment(not_author_client, comment,

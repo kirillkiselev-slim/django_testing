@@ -24,24 +24,29 @@ REDIRECT_URL_DELETE_COMMENT = (pytest.
 
 
 @pytest.mark.parametrize(
-    'url, user, expected_status, expected_redirect',
+    'url, user, expected_status',
     (
-        (NEWS_LOGIN_URL, CLIENT, OK_STATUS, None),
-        (NEWS_LOGOUT_URL, CLIENT, OK_STATUS, None),
-        (NEWS_SIGNUP_URL, CLIENT, OK_STATUS, None),
-        (NEWS_DETAIL_URL, CLIENT, OK_STATUS, None),
-        (NEWS_HOME_URL, CLIENT, OK_STATUS, None),
-        (COMMENT_EDIT_URL, NOT_AUTHOR_CLIENT, NOT_FOUND_STATUS, None),
-        (COMMENT_DELETE_URL, AUTHOR_CLIENT, OK_STATUS, None),
-        (COMMENT_EDIT_URL, CLIENT, None, REDIRECT_URL_EDIT_COMMENT),
-        (COMMENT_DELETE_URL, CLIENT, None, REDIRECT_URL_DELETE_COMMENT),
+        (NEWS_LOGIN_URL, CLIENT, OK_STATUS),
+        (NEWS_LOGOUT_URL, CLIENT, OK_STATUS),
+        (NEWS_SIGNUP_URL, CLIENT, OK_STATUS),
+        (NEWS_DETAIL_URL, CLIENT, OK_STATUS),
+        (NEWS_HOME_URL, CLIENT, OK_STATUS),
+        (COMMENT_EDIT_URL, NOT_AUTHOR_CLIENT, NOT_FOUND_STATUS),
+        (COMMENT_DELETE_URL, AUTHOR_CLIENT, OK_STATUS),
     ),
+
 )
-def test_page_availability_and_redirection(url, user,
-                                           expected_status,
-                                           expected_redirect):
-    response = user.get(url)
-    if expected_status is not None:
-        assert response.status_code == expected_status
-    if expected_redirect is not None:
-        assertRedirects(response, expected_redirect)
+def test_pages_availability_for_users(url, user, expected_status):
+    assert user.get(url).status_code == expected_status
+
+
+@pytest.mark.parametrize(
+    'url, user, expected_redirect',
+    (
+        (COMMENT_EDIT_URL, CLIENT, REDIRECT_URL_EDIT_COMMENT),
+        (COMMENT_DELETE_URL, CLIENT, REDIRECT_URL_DELETE_COMMENT),
+    ),
+
+)
+def test_redirects(url, user, expected_redirect):
+    assertRedirects(user.get(url), expected_redirect)
