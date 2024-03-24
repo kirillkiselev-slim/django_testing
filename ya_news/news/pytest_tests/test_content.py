@@ -31,7 +31,7 @@ def test_news_comments_order(comments, news_detail, author_client):
     assert comment_dates == sorted(comment_dates)
 
 
-def test_form_on__news_page_for_auth_user(author_client, news_detail):
+def test_form_on_news_page_for_auth_user(author_client, news_detail):
     response = author_client.get(news_detail)
     assert 'form' in response.context
     assert isinstance(response.context['form'], CommentForm)
